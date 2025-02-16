@@ -6,11 +6,14 @@ import {
     Platform,
     SafeAreaView,
     StatusBar,
-    StyleSheet,
+    StyleSheet, View, Text, Pressable
 } from "react-native";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
+import { Link } from "expo-router";
 
 export default function Home() {
+    const [qrCodeUrl, setQrCodeUrl] = useState<string | null>(null); // State to store the QR code URL
+
     const qrLock = useRef(false);
     const appState = useRef(AppState.currentState);
 
@@ -38,19 +41,45 @@ export default function Home() {
                     headerShown: false,
                 }}
             />
-            {Platform.OS === "android" ? <StatusBar hidden /> : null}
+            {Platform.OS === "ios" ? <StatusBar hidden /> : null}
             <CameraView
                 style={StyleSheet.absoluteFillObject}
                 facing="back"
                 onBarcodeScanned={({ data }) => {
                     if (data && !qrLock.current) {
                         qrLock.current = true;
+                        setQrCodeUrl(data);
+
+                        /*
                         setTimeout(async () => {
                             await Linking.openURL(data);
                         }, 500);
+                        */
                     }
                 }}
+
             />
+            <Pressable>
+                <Text style={styles.urlStyle}>
+                    Scanned QR URL: {qrCodeUrl}
+                </Text>
+            </Pressable>
         </SafeAreaView>
     );
 }
+
+const styles = StyleSheet.create({
+    urlContainer: {
+        position: "absolute",
+        bottom: 20,
+        left: 20,
+        right: 20,
+        backgroundColor: "rgba(0, 0, 0, 0.7)",
+        padding: 10,
+        borderRadius: 10,
+    },
+    urlStyle: {
+        color: "white",
+        fontSize: 16,
+    },
+});
