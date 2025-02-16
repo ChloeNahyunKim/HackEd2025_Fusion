@@ -1,27 +1,25 @@
 import { View, Text, StyleSheet, SafeAreaView, Pressable, Image, Platform } from "react-native";
 import { Link, Stack } from "expo-router";
-import { HelloWave } from '@/components/HelloWave';
 import ParallaxScrollView from '@/components/ParallaxScrollView';
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
+import React from 'react';
 import { useCameraPermissions } from "expo-camera";
 
+
 export default function HomeScreen() {
+  const [permission, requestPermission] = useCameraPermissions();
+
+  const isPermissionGranted = Boolean(permission?.granted);
+
   return (
-    <ParallaxScrollView
-      headerBackgroundColor={{ light: '#A1CEDC', dark: '#1D3D47' }}
-      headerImage={
-        <Image
-          source={require('@/assets/images/partial-react-logo.png')}
-          style={styles.reactLogo}
-        />
-      }>
+    <SafeAreaView
+      style={styles.titleContainer}>
       <ThemedView style={styles.titleContainer}>
-        <ThemedText type="title">hi!</ThemedText>
-        <HelloWave />
+        <ThemedText type="title">Fusion</ThemedText>
       </ThemedView>
 
-    </ParallaxScrollView>
+    </SafeAreaView>
   );
 }
 
@@ -29,17 +27,9 @@ const styles = StyleSheet.create({
   titleContainer: {
     flexDirection: 'row',
     alignItems: 'center',
+    justifyContent: 'center',
+    marginTop: 160,
     gap: 8,
-  },
-  stepContainer: {
-    gap: 8,
-    marginBottom: 8,
-  },
-  reactLogo: {
-    height: 178,
-    width: 290,
-    bottom: 0,
-    left: 0,
-    position: 'absolute',
+    backgroundColor: '#A1CEDC',
   },
 });
