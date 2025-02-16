@@ -1,7 +1,6 @@
 import { View, Text, StyleSheet, SafeAreaView, Pressable, Linking } from "react-native";
 import { Link, Stack } from "expo-router";
 import React, { useEffect } from 'react';
-import { Camera } from 'expo-camera';
 import { useCameraPermissions } from "expo-camera";
 
 export default function HomeScreen() {
