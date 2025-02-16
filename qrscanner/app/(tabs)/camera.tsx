@@ -1,45 +1,56 @@
-import { View, Text, StyleSheet, SafeAreaView, Pressable, Image, Platform } from "react-native";
-import { Link, Stack } from "expo-router";
-import { HelloWave } from '@/components/HelloWave';
-import ParallaxScrollView from '@/components/ParallaxScrollView';
-import { ThemedText } from '@/components/ThemedText';
-import { ThemedView } from '@/components/ThemedView';
-import { useCameraPermissions } from "expo-camera";
+import { Camera, CameraView } from "expo-camera";
+import { Stack } from "expo-router";
+import {
+    AppState,
+    Linking,
+    Platform,
+    SafeAreaView,
+    StatusBar,
+    StyleSheet,
+} from "react-native";
+import { useEffect, useRef } from "react";
 
-export default function HomeScreen() {
+export default function Home() {
+    const qrLock = useRef(false);
+    const appState = useRef(AppState.currentState);
+
+    useEffect(() => {
+        const subscription = AppState.addEventListener("change", (nextAppState) => {
+            if (
+                appState.current.match(/inactive|background/) &&
+                nextAppState === "active"
+            ) {
+                qrLock.current = false;
+            }
+            appState.current = nextAppState;
+        });
+
+        return () => {
+            subscription.remove();
+        };
+    }, []);
+
     return (
-        <ParallaxScrollView
-            headerBackgroundColor={{ light: '#A1CEDC', dark: '#1D3D47' }}
-            headerImage={
-                <Image
-                    source={require('@/assets/images/partial-react-logo.png')}
-                    style={styles.reactLogo}
-                />
-            }>
-            <ThemedView style={styles.titleContainer}>
-                <ThemedText type="title">hi!</ThemedText>
-                <HelloWave />
-            </ThemedView>
-
-        </ParallaxScrollView>
+        <SafeAreaView style={StyleSheet.absoluteFillObject}>
+            <Stack.Screen
+                options={{
+                    title: "Overview",
+                    headerShown: false,
+                }}
+            />
+            {Platform.OS === "android" ? <StatusBar hidden /> : null}
+            <CameraView
+                style={StyleSheet.absoluteFillObject}
+                facing="back"
+                onBarcodeScanned={({ data }) => {
+                    if (data && !qrLock.current) {
+                        qrLock.current = true;
+                        setTimeout(async () => {
+                            await Linking.openURL(data);
+                        }, 500);
+                    }
+                }}
+            />
+        </SafeAreaView>
     );
 }
-
-const styles = StyleSheet.create({
-    titleContainer: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        gap: 8,
-    },
-    stepContainer: {
-        gap: 8,
-        marginBottom: 8,
-    },
-    reactLogo: {
-        height: 178,
-        width: 290,
-        bottom: 0,
-        left: 0,
-        position: 'absolute',
-    },
-});
