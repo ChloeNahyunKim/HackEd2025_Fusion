@@ -1,4 +1,4 @@
-import { View, Text, StyleSheet, SafeAreaView, Pressable } from "react-native";
+import { View, Text, StyleSheet, SafeAreaView, Pressable, Image } from "react-native";
 import { Link, Stack, useRouter } from "expo-router";
 import React, { useEffect } from "react";
 import { useCameraPermissions } from "expo-camera";
@@ -13,7 +13,7 @@ export default function HomeScreen() {
     if (isPermissionGranted) {
       const timer = setTimeout(() => {
         router.replace("/(tabs)/camera"); // Navigate to the camera page
-      }, 1000); // 1 seconds delay
+      }, 1000); // 1-second delay
 
       return () => clearTimeout(timer); // Cleanup to prevent memory leaks
     }
@@ -22,7 +22,11 @@ export default function HomeScreen() {
   return (
     <SafeAreaView style={styles.container}>
       <Stack.Screen options={{ title: "Overview", headerShown: false }} />
-      <Text style={styles.title}>Qusion</Text>
+      {/* Logo and Title */}
+      <View style={styles.logoContainer}>
+        <Image source={require("../../assets/images/Qusion_logo.png")} style={styles.logo} />
+      </View>
+
       <View style={{ gap: 20 }}>
         <Pressable onPress={requestPermission}>
           <Text style={styles.buttonStyle}>Request Permissions</Text>
@@ -39,6 +43,16 @@ const styles = StyleSheet.create({
     backgroundColor: "#020f54",
     justifyContent: "space-around",
     paddingVertical: 80,
+  },
+  logoContainer: {
+    flexDirection: "row", // Arrange logo and text side by side
+    alignItems: "center",
+    gap: 10, // Space between logo and text
+  },
+  logo: {
+    width: 300,
+    height: 300,
+    resizeMode: "contain",
   },
   buttonStyle: {
     color: "white",

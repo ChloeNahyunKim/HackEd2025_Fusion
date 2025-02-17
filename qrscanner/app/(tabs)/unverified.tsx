@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, Modal, Pressable, Linking, SafeAreaView } from "react-native";
+import { View, Text, StyleSheet, Modal, Pressable, Linking } from "react-native";
 import { useRouter } from "expo-router";
 import { Link } from "expo-router";
 
@@ -29,49 +29,58 @@ export default function GoodUrlWarning({ visible, onClose }: { visible: boolean;
     };
 
     return (
-        <SafeAreaView style={styles.container}>
+        <Modal transparent visible={visible} animationType="fade">
+            <View style={styles.overlay}>
+                <View style={styles.modalContainer}>
+                    <Text style={styles.title}>Unverified Site</Text>
+                    <Text style={styles.description}>
+                        This site is unverified, it may pose security risks.
+                    </Text>
+                    <Pressable style={styles.button} onPress={redirectToRandomUrl}>
+                        <Text style={styles.buttonText}>Proceed</Text>
+                    </Pressable>
 
-            <Text style={styles.title}>Unverified Site</Text>
-            <Text style={styles.description}>
-                This site is unverified, it may pose security risks.
-            </Text>
-            <Pressable style={styles.button} onPress={redirectToRandomUrl}>
-                <Text style={styles.buttonText}>Proceed</Text>
-            </Pressable>
-
-            {/* Go to Camera Button with Link */}
-            <Pressable
-                style={styles.button}
-                onPress={() => {
-                }}
-            >
-                <Link href="/(tabs)/camera">
-                    <Text style={styles.buttonText}>Go to Camera</Text>
-                </Link>
-            </Pressable>
+                    {/* Go to Camera Button with Link */}
+                    <Pressable
+                        style={styles.button}
+                        onPress={() => {
+                        }}
+                    >
+                        <Link href="/(tabs)/camera">
+                            <Text style={styles.buttonText}>Go to Camera</Text>
+                        </Link>
+                    </Pressable>
 
 
-            <Pressable
-                style={styles.button}
-                onPress={() => {
-                    handleReportPress(); // Trigger report with delay
-                }}
-            >
-                <Text style={styles.buttonText}>
-                    Report this webpage. Number of reports: {reportCount}
-                </Text>
-            </Pressable>
-        </SafeAreaView>
+                    <Pressable
+                        style={styles.button}
+                        onPress={() => {
+                            handleReportPress(); // Trigger report with delay
+                        }}
+                    >
+                        <Text style={styles.buttonText}>
+                            Report this webpage. Number of reports: {reportCount}
+                        </Text>
+                    </Pressable>
+                </View>
+            </View>
+        </Modal>
     );
 }
 
 const styles = StyleSheet.create({
-    container: {
+    overlay: {
         flex: 1,
+        backgroundColor: "rgba(0, 0, 0, 0.6)",
+        justifyContent: "center",
         alignItems: "center",
-        backgroundColor: "black",
-        justifyContent: "space-around",
-        paddingVertical: 80,
+    },
+    modalContainer: {
+        backgroundColor: "#F1D253",
+        padding: 20,
+        borderRadius: 20,
+        alignItems: "center",
+        width: 300,
     },
     title: {
         color: "white",

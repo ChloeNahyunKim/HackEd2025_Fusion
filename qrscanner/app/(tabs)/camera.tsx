@@ -23,7 +23,7 @@ export default function Home() {
     };
     const checkGoodQRCodeUrl = (url: string | null) => {
         if (url) {
-            return url === "https://www.google.com";
+            return url === "https://www.canada.ca/";
         }
         return false;
     };
