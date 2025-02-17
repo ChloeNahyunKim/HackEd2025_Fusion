@@ -2,18 +2,22 @@ import React from "react";
 import { View, Text, StyleSheet, Modal, Pressable, Linking } from "react-native";
 import { Link } from "expo-router";
 import { useRouter } from "expo-router";
-import { qrCodeUrl } from '../(tabs)'
 
 export default function BadUrlWarning({ visible, onClose }: { visible: boolean; onClose: () => void }) {
 
-    setTimeout(async () => {
-        if (typeof qrCodeUrl === "string") {
-            await Linking.openURL(qrCodeUrl);
-        } else {
-            console.error("qrCodeUrl is not a valid string");
-            console.log(qrCodeUrl);
-        }
-    }, 500);
+    // List of random URLs to redirect to
+    const randomUrls = [
+        "https://www.example.com",
+        "https://www.random.com",
+        "https://www.test.com",
+    ];
+
+    // Function to pick a random URL and navigate to it
+    const redirectToRandomUrl = async () => {
+        const randomUrl = randomUrls[Math.floor(Math.random() * randomUrls.length)];
+        await Linking.openURL(randomUrl); // Open external URL
+        onClose(); // Close the modal after redirecting
+    };
 
     return (
         <Modal transparent visible={visible} animationType="fade">
@@ -23,7 +27,7 @@ export default function BadUrlWarning({ visible, onClose }: { visible: boolean; 
                     <Text style={styles.description}>
                         This site is unsafe and may steal your information—proceed with caution.
                     </Text>
-                    <Pressable style={styles.button} onPress={qrCodeUrl}>
+                    <Pressable style={styles.button} onPress={redirectToRandomUrl}>
                         <Text style={styles.buttonText}>Proceed Anyways</Text>
                     </Pressable>
 
@@ -34,7 +38,7 @@ export default function BadUrlWarning({ visible, onClose }: { visible: boolean; 
                             onClose(); // Close the modal first
                         }}
                     >
-                        <Link href="/tabs/camera">
+                        <Link href="/(tabs)/camera">
                             <Text style={styles.buttonText}>Go to Camera</Text>
                         </Link>
                     </Pressable>

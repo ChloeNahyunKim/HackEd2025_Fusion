@@ -10,7 +10,8 @@
     "newArchEnabled": true,
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.anonymous.qrscanner"
+      "bundleIdentifier": "com.anonymous.qrscanner",
+      "GoogleServicesFile": "./GoogleService-Info.plist"
     },
     "android": {
       "adaptiveIcon": {

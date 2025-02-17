@@ -1,23 +1,19 @@
 from flask import Flask, request, jsonify
-from flask_pymongo import PyMongo
 import requests
 import base64
+import firebase_admin
+from firebase_admin import credentials, firestore
 
-app = Flask(__name__)
+# Initialize Firebase Admin SDK
+cred = credentials.Certificate("/Users/chloekim/Downloads/HackEd2025_Fusion/fusion-ccfe3-firebase-adminsdk-fbsvc-2ca5394d8e.json")  # Replace with your Firebase service account key
+firebase_admin.initialize_app(cred)
 
-# MongoDB connection URI
-MONGO_URI = "mongodb://localhost:27017/Fusion"
-app.config["MONGO_URI"] = MONGO_URI
-mongo = PyMongo(app)
-
-# Select the databases and collections
-fusion_db = mongo.db["Fusion"]
-bad_urls_fusion = fusion_db["Bad URL"]
-good_urls_fusion = fusion_db["Good URL"]
+# Initialize Firestore
+db = firestore.client()
 
 # Google Safe Browsing API function
-def google_safe_browsing(url, bad_urls, good_urls):
-    API_KEY = "AIzaSyA1CmCivCfSHk6Ub2j9-pGWbGJnjNk1MRE"  # Replace with your Google Safe Browsing API key
+def google_safe_browsing(url):
+    API_KEY = "AIzaSyA1CmCivCfSHk6Ub2j9-pGWbGJnjNk1MRE"
     api_url = "https://safebrowsing.googleapis.com/v4/threatMatches:find"
 
     payload = {
@@ -39,14 +35,14 @@ def google_safe_browsing(url, bad_urls, good_urls):
     if response.status_code == 200:
         matches = response.json().get("matches", [])
         if matches:
-            bad_urls.insert_one({"url": url})
+            db.collection("bad_urls").add({"url": url})  # Add to Firestore "bad_urls" collection
             return "Bad URL"
         else:
             return "Not suspicious URL"
     else:
         return "Unknown URL"
 
-def virsus_total(url, bad_urls, good_urls):
+def virus_total(url):
     VT_API_KEY = "8554009f375f25f2e52a377589aebf072f312dd806668c34d49b99d0c6ef5a5b"  # Replace with your VirusTotal API key
     headers = {"x-apikey": VT_API_KEY}
     urltoscan = url
@@ -57,25 +53,28 @@ def virsus_total(url, bad_urls, good_urls):
         categories = response.json()["data"]["attributes"]["last_analysis_results"]
         for value in categories.values():
             if value["category"] == "malicious" or value["category"] == "suspicious":
-                bad_urls.insert_one({"url": url})
+                db.collection("bad_urls").add({"url": url})  # Add to Firestore "bad_urls" collection
                 return "Bad URL"
             else:
-                good_urls.insert_one({"url": url})
+                db.collection("good_urls").add({"url": url})  # Add to Firestore "good_urls" collection
                 return "Good URL"
     except:
-        return google_safe_browsing(url, bad_urls, good_urls)
+        return google_safe_browsing(url)
 
 def check_url(url):
-    bad_url_result_fusion = bad_urls_fusion.find_one({"url": url})
-    good_url_result_fusion = good_urls_fusion.find_one({"url": url})
-
-    if bad_url_result_fusion:
+    # Check if URL exists in Firestore "bad_urls" collection
+    bad_url_query = db.collection("bad_urls").where("url", "==", url).get()
+    if bad_url_query:
         return "Bad URL (Fusion)"
-    elif good_url_result_fusion:
+
+    # Check if URL exists in Firestore "good_urls" collection
+    good_url_query = db.collection("good_urls").where("url", "==", url).get()
+    if good_url_query:
         return "Good URL (Fusion)"
-    else:
-        output = virsus_total(url, bad_urls_fusion, good_urls_fusion)
-        return output
+
+    # If URL is not in Firestore, check with VirusTotal and Google Safe Browsing
+    output = virus_total(url)
+    return output
 
 # API endpoint to check a URL
 @app.route('/check-url', methods=['POST'])
