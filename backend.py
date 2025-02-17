@@ -1,19 +1,23 @@
 from flask import Flask, request, jsonify
 import requests
 import base64
+from dotenv import load_dotenv
+import os
 import firebase_admin
 from firebase_admin import credentials, firestore
 
 # Initialize Firebase Admin SDK
-cred = credentials.Certificate("/Users/chloekim/Downloads/HackEd2025_Fusion/fusion-ccfe3-firebase-adminsdk-fbsvc-2ca5394d8e.json")  # Replace with your Firebase service account key
+cred = credentials.Certificate("./fusion-ccfe3-firebase-adminsdk-fbsvc-2ca5394d8e.json")  # Replace with your Firebase service account key
 firebase_admin.initialize_app(cred)
+
+app = Flask(__name__)
 
 # Initialize Firestore
 db = firestore.client()
 
 # Google Safe Browsing API function
 def google_safe_browsing(url):
-    API_KEY = "AIzaSyA1CmCivCfSHk6Ub2j9-pGWbGJnjNk1MRE"
+    GOOGLE_API_KEY = os.getenv('GOOGLE_API_KEY')
     api_url = "https://safebrowsing.googleapis.com/v4/threatMatches:find"
 
     payload = {
@@ -29,7 +33,7 @@ def google_safe_browsing(url):
         }
     }
 
-    params = {"key": API_KEY}
+    params = {"key": GOOGLE_API_KEY}
     response = requests.post(api_url, json=payload, params=params)
 
     if response.status_code == 200:
@@ -43,7 +47,7 @@ def google_safe_browsing(url):
         return "Unknown URL"
 
 def virus_total(url):
-    VT_API_KEY = "8554009f375f25f2e52a377589aebf072f312dd806668c34d49b99d0c6ef5a5b"  # Replace with your VirusTotal API key
+    VT_API_KEY = os.getenv('VT_API_KEY')
     headers = {"x-apikey": VT_API_KEY}
     urltoscan = url
     url_id = base64.urlsafe_b64encode(urltoscan.encode()).decode().strip("=")
