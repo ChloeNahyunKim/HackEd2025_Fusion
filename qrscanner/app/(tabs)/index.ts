@@ -1,0 +1,1 @@
+export { default as qrCodeUrl } from './camera';
