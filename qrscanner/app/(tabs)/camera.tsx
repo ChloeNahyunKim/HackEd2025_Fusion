@@ -9,10 +9,49 @@ import {
     StyleSheet, View, Text, Pressable
 } from "react-native";
 import { useEffect, useRef, useState } from "react";
-import { Link } from "expo-router";
+import { Link, useRouter } from "expo-router";
 
 export default function Home() {
-    const [qrCodeUrl, setQrCodeUrl] = useState<string | null>(null); // State to store the QR code URL
+    const [qrCodeUrl, setQrCodeUrl] = useState<string | null>(null);
+    const router = useRouter();
+
+    const checkBadQRCodeUrl = (url: string | null) => {
+        if (url) {
+            return url === "https://www.g00gle.com";
+        }
+        return false;
+    };
+    const checkGoodQRCodeUrl = (url: string | null) => {
+        if (url) {
+            return url === "https://www.google.com";
+        }
+        return false;
+    };
+
+    const checkUnverifiedQRCodeUrl = (url: string | null) => {
+        if (url) {
+            return url === "https://www.riavashguneetchloe.com";
+        }
+        return false;
+    };
+
+    useEffect(() => {
+        if (qrCodeUrl && checkBadQRCodeUrl(qrCodeUrl)) {
+            router.push("/(tabs)/suspicious"); // Automatically navigate to the new page
+        }
+    }, [qrCodeUrl]); // Only run this when qrCodeUrl changes
+
+    useEffect(() => {
+        if (qrCodeUrl && checkGoodQRCodeUrl(qrCodeUrl)) {
+            router.push("/(tabs)/not_suspicious"); // Automatically navigate to the new page
+        }
+    }, [qrCodeUrl]); // Only run this when qrCodeUrl changes
+
+    useEffect(() => {
+        if (qrCodeUrl && checkUnverifiedQRCodeUrl(qrCodeUrl)) {
+            router.push("/(tabs)/unverified"); // Automatically navigate to the new page
+        }
+    }, [qrCodeUrl]); // Only run this when qrCodeUrl changes
 
     const qrLock = useRef(false);
     const appState = useRef(AppState.currentState);
@@ -49,21 +88,28 @@ export default function Home() {
                     if (data && !qrLock.current) {
                         qrLock.current = true;
                         setQrCodeUrl(data);
-
-                        /*
-                        setTimeout(async () => {
-                            await Linking.openURL(data);
-                        }, 500);
-                        */
                     }
                 }}
-
             />
-            <Pressable>
-                <Text style={styles.urlStyle}>
-                    Scanned QR URL: {qrCodeUrl}
-                </Text>
-            </Pressable>
+            {qrCodeUrl && checkBadQRCodeUrl(qrCodeUrl) && (
+                <View style={styles.urlContainer}>
+                    <Link href="/(tabs)/suspicious" style={styles.urlStyle}>
+                    </Link>
+                </View>
+            )}
+            {qrCodeUrl && checkGoodQRCodeUrl(qrCodeUrl) && (
+                <View style={styles.urlContainer}>
+                    <Link href="/(tabs)/not_suspicious" style={styles.urlStyle}>
+                    </Link>
+                </View>
+            )}
+            {qrCodeUrl && checkUnverifiedQRCodeUrl(qrCodeUrl) && (
+                <View style={styles.urlContainer}>
+                    <Link href="/(tabs)/unverified" style={styles.urlStyle}>
+                    </Link>
+                </View>
+            )}
+
         </SafeAreaView>
     );
 }

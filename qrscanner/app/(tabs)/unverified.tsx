@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, Pressable, Linking, SafeAreaView } from "react-native";
+import { View, Text, StyleSheet, Modal, Pressable, Linking, SafeAreaView } from "react-native";
 import { useRouter } from "expo-router";
 import { Link } from "expo-router";
 
@@ -8,9 +8,9 @@ export default function GoodUrlWarning({ visible, onClose }: { visible: boolean;
 
     // List of random URLs to redirect to
     const randomUrls = [
-        "https://www.google.com",
-        "https://www.google.com",
-        "https://www.google.com",
+        "www.riavashguneetchloe.com",
+        "www.riavashguneetchloe.com",
+        "www.riavashguneetchloe.com",
     ];
 
     const [reportCount, setReportCount] = useState(0);
@@ -30,9 +30,10 @@ export default function GoodUrlWarning({ visible, onClose }: { visible: boolean;
 
     return (
         <SafeAreaView style={styles.container}>
-            <Text style={styles.title}>Secure Access</Text>
+
+            <Text style={styles.title}>Unverified Site</Text>
             <Text style={styles.description}>
-                This site is secure and protects your information—you can proceed safely.
+                This site is unverified, it may pose security risks.
             </Text>
             <Pressable style={styles.button} onPress={redirectToRandomUrl}>
                 <Text style={styles.buttonText}>Proceed</Text>

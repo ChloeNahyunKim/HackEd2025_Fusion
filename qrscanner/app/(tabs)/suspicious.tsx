@@ -1,62 +1,72 @@
-import React from "react";
-import { View, Text, StyleSheet, Modal, Pressable, Linking } from "react-native";
+import React, { useState } from 'react';
+import { View, Text, StyleSheet, Pressable, Linking, SafeAreaView } from "react-native";
 import { Link } from "expo-router";
-import { useRouter } from "expo-router";
-import { qrCodeUrl } from '../(tabs)'
 
 export default function BadUrlWarning({ visible, onClose }: { visible: boolean; onClose: () => void }) {
 
-    setTimeout(async () => {
-        if (typeof qrCodeUrl === "string") {
-            await Linking.openURL(qrCodeUrl);
-        } else {
-            console.error("qrCodeUrl is not a valid string");
-            console.log(qrCodeUrl);
-        }
-    }, 500);
+    // List of random URLs to redirect to
+    const randomUrls = [
+        "https://www.g00gle.com",
+        "https://www.g00gle.com",
+        "https://www.g00gle.com",
+    ];
+
+    const [reportCount, setReportCount] = useState(1); // Initial report count is 1
+
+    const redirectToRandomUrl = async () => {
+        const randomUrl = randomUrls[Math.floor(Math.random() * randomUrls.length)];
+        await Linking.openURL(randomUrl);
+        onClose();
+    };
+
+    const handleReportPress = () => {
+        setTimeout(() => {
+            setReportCount(reportCount + 1); // Increment report count after 1 second
+        }, 1000);
+    };
 
     return (
-        <Modal transparent visible={visible} animationType="fade">
-            <View style={styles.overlay}>
-                <View style={styles.modalContainer}>
-                    <Text style={styles.title}>Safety Warning</Text>
-                    <Text style={styles.description}>
-                        This site is unsafe and may steal your information—proceed with caution.
-                    </Text>
-                    <Pressable style={styles.button} onPress={qrCodeUrl}>
-                        <Text style={styles.buttonText}>Proceed Anyways</Text>
-                    </Pressable>
+        <SafeAreaView style={styles.container}>
+            <Text style={styles.title}>Safety Warning</Text>
+            <Text style={styles.description}>
+                This site is unsafe and may steal your information—proceed with caution.
+            </Text>
+            <Pressable style={styles.button} onPress={redirectToRandomUrl}>
+                <Text style={styles.buttonText}>Proceed Anyways</Text>
+            </Pressable>
 
-                    {/* Go to Camera Button with Link */}
-                    <Pressable
-                        style={styles.button}
-                        onPress={() => {
-                            onClose(); // Close the modal first
-                        }}
-                    >
-                        <Link href="/tabs/camera">
-                            <Text style={styles.buttonText}>Go to Camera</Text>
-                        </Link>
-                    </Pressable>
-                </View>
-            </View>
-        </Modal>
+            {/* Go to Camera Button with Link */}
+            <Pressable
+                style={styles.button}
+                onPress={() => {
+                }}
+            >
+                <Link href="/(tabs)/camera">
+                    <Text style={styles.buttonText}>Go to Camera</Text>
+                </Link>
+            </Pressable>
+
+            <Pressable
+                style={styles.button}
+                onPress={() => {
+                    handleReportPress(); // Trigger report with delay
+                }}
+            >
+                <Text style={styles.buttonText}>
+                    Report this webpage. Number of reports: {reportCount}
+                </Text>
+            </Pressable>
+        </SafeAreaView>
     );
 }
 
 const styles = StyleSheet.create({
-    overlay: {
+    container: {
         flex: 1,
-        backgroundColor: "rgba(0, 0, 0, 0.6)",
-        justifyContent: "center",
         alignItems: "center",
-    },
-    modalContainer: {
-        backgroundColor: "#D9534F",
-        padding: 20,
-        borderRadius: 20,
-        alignItems: "center",
-        width: 300,
+        backgroundColor: "black",
+        justifyContent: "space-around",
+        paddingVertical: 80,
     },
     title: {
         color: "white",
