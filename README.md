@@ -33,12 +33,10 @@ Expansion into Android: We’re preparing for a full launch on Android to ensure
 * Ria Ahir
 
 ## Built With
-1. canva
-2. capcut
-3. expo.io
-4. firebase
-5. flask
-6. googlesafebrowsing
-7. python
-8. reactnative
-9. virustotal
+3. Expo
+4. Firebase
+5. Flask
+6. Python
+7. Virustotal API
+8. Googlesafebrowsing API
+10. React Native
